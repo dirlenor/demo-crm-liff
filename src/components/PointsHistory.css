@@ -1,0 +1,106 @@
+.transactions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.transaction-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 0;
+  border-bottom: 1px solid #f3f4f6;
+  transition: background 0.2s;
+}
+
+.transaction-item:last-child {
+  border-bottom: none;
+}
+
+.transaction-item:hover {
+  background: #fafafa;
+  margin: 0 -16px;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.transaction-icon-wrapper {
+  flex-shrink: 0;
+}
+
+.transaction-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  background: #f3f4f6;
+}
+
+.transaction-item.earn .transaction-icon {
+  background: #d1fae5;
+}
+
+.transaction-item.redeem .transaction-icon {
+  background: #fee2e2;
+}
+
+.transaction-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.transaction-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: start;
+  margin-bottom: 4px;
+}
+
+.transaction-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: #1f2937;
+  flex: 1;
+  margin-right: 12px;
+}
+
+.transaction-amount {
+  font-size: 18px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.transaction-amount.earn {
+  color: #10b981;
+}
+
+.transaction-amount.redeem {
+  color: #ef4444;
+}
+
+.transaction-date {
+  font-size: 13px;
+  color: #9ca3af;
+}
+
+.no-transactions {
+  text-align: center;
+  padding: 60px 20px;
+  background: #f9fafb;
+  border-radius: 16px;
+}
+
+.no-transactions-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.no-transactions p {
+  color: #6b7280;
+  font-size: 16px;
+  font-weight: 500;
+}
