@@ -8,9 +8,10 @@ import './Products.css';
 interface ProductsProps {
   userId: string;
   onRedeemSuccess?: () => void;
+  onRedeem?: (redemptionId: string) => void;
 }
 
-export const Products = ({ userId, onRedeemSuccess }: ProductsProps) => {
+export const Products = ({ userId, onRedeemSuccess, onRedeem }: ProductsProps) => {
   const [products, setProducts] = useState<Product[]>([]);
   const [user, setUser] = useState<TourMember | null>(null);
   const [loading, setLoading] = useState(true);
@@ -56,11 +57,12 @@ export const Products = ({ userId, onRedeemSuccess }: ProductsProps) => {
     setMessage(null);
 
     try {
-      await redeemProduct(userId, product.id);
+      const { redemptionId } = await redeemProduct(userId, product.id);
       setMessage(t('message.productRedeemed') || `แลก ${product.name} สำเร็จ`);
       onRedeemSuccess?.();
       await loadData();
-      setTimeout(() => setMessage(null), 3000);
+      // Navigate to redemption detail page
+      onRedeem?.(redemptionId);
     } catch (error: any) {
       console.error('Error redeeming product:', error);
       const errorMsg = error.message?.includes('Insufficient') 
@@ -104,7 +106,12 @@ export const Products = ({ userId, onRedeemSuccess }: ProductsProps) => {
 
       {products.length === 0 ? (
         <div className="no-products">
-          <div className="no-products-icon">📦</div>
+          <div className="no-products-icon">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="3" y="3" width="18" height="18" rx="2"/>
+              <path d="M9 9h6v6H9z"/>
+            </svg>
+          </div>
           <p>{t('products.noProducts') || 'ยังไม่มีสินค้า'}</p>
         </div>
       ) : (
@@ -119,7 +126,12 @@ export const Products = ({ userId, onRedeemSuccess }: ProductsProps) => {
                 {product.image_url ? (
                   <img src={product.image_url} alt={getProductName(product)} className="product-image" />
                 ) : (
-                  <div className="product-image-placeholder">📦</div>
+                  <div className="product-image-placeholder">
+                    <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <rect x="3" y="3" width="18" height="18" rx="2"/>
+                      <path d="M9 9h6v6H9z"/>
+                    </svg>
+                  </div>
                 )}
                 
                 <div className="product-info">
@@ -130,7 +142,11 @@ export const Products = ({ userId, onRedeemSuccess }: ProductsProps) => {
                   
                   <div className="product-footer">
                     <div className="product-points">
-                      <span className="points-icon">⭐</span>
+                      <span className="points-icon">
+                        <svg width="18" height="18" viewBox="0 0 20 20" fill="currentColor">
+                          <path d="M10 2l2.09 4.26L17 7l-3.18 3.09L14.82 15 10 12.77 5.18 15l.36-4.91L3 7l4.91-.74L10 2z"/>
+                        </svg>
+                      </span>
                       <span className="points-value">{product.points_required.toLocaleString()}</span>
                       <span className="points-label">{t('common.points')}</span>
                     </div>

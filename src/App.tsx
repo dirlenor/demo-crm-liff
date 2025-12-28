@@ -93,7 +93,11 @@ function App() {
     return (
       <div className="app-container">
         <div className="error-container">
-          <div className="error-icon">⚠️</div>
+          <div className="error-icon">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M12 9v4M12 17h.01M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z"/>
+            </svg>
+          </div>
           <h2 className="error-title">{error}</h2>
           <div className="error-tips">
             <p className="tips-title">ตรวจสอบ:</p>
@@ -113,7 +117,12 @@ function App() {
     return (
       <div className="app-container">
         <div className="error-container">
-          <div className="error-icon">❌</div>
+          <div className="error-icon">
+            <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="12" cy="12" r="10"/>
+              <path d="M15 9l-6 6M9 9l6 6"/>
+            </svg>
+          </div>
           <p className="error-title">{t('message.error')}</p>
         </div>
       </div>
@@ -125,7 +134,6 @@ function App() {
       {qrMessage && (
         <div className={`qr-message ${qrMessage.includes('สำเร็จ') || qrMessage.includes('successfully') ? 'success' : 'error'}`}>
           <div className="qr-message-content">
-            {qrMessage.includes('สำเร็จ') || qrMessage.includes('successfully') ? '✅' : '❌'}
             <span>{qrMessage}</span>
           </div>
         </div>

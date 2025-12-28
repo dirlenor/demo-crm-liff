@@ -1,118 +1,24 @@
 .transactions-page {
-  max-width: 1400px;
+  padding-top: 16px;
 }
 
-.page-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
+.transactions-grid {
+  display: grid !important;
+  grid-template-columns: 48px 1.5fr 1.5fr 1fr 1fr 2fr !important;
 }
 
-.page-title {
-  font-size: 32px;
-  font-weight: 700;
-  color: #1f2937;
-}
-
-.refresh-btn {
-  padding: 10px 20px;
-  background: #1f2937;
-  color: white;
-  border: none;
-  border-radius: 10px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-size: 14px;
-}
-
-.refresh-btn:hover {
-  background: #374151;
-  transform: translateY(-1px);
-}
-
-.transactions-table-container {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 16px;
-  padding: 24px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-  overflow-x: auto;
-}
-
-.transactions-table {
-  width: 100%;
-  border-collapse: collapse;
-}
-
-.transactions-table th {
-  text-align: left;
-  padding: 12px;
-  font-weight: 600;
-  color: #6b7280;
-  border-bottom: 1px solid #e5e7eb;
-  font-size: 14px;
-  background: #f9fafb;
-}
-
-.transactions-table td {
-  padding: 12px;
-  border-bottom: 1px solid #f3f4f6;
-  font-size: 14px;
-}
-
-.transactions-table tr:hover {
-  background: #f9fafb;
-}
-
-.transactions-table tr:last-child td {
-  border-bottom: none;
-}
-
-.badge {
-  display: inline-block;
-  padding: 4px 12px;
-  border-radius: 12px;
+.user-id-modern {
+  font-family: monospace;
   font-size: 12px;
-  font-weight: 600;
-}
-
-.badge.earn {
-  background: #d1fae5;
-  color: #065f46;
-}
-
-.badge.redeem {
-  background: #fee2e2;
-  color: #991b1b;
+  color: #8e9297;
 }
 
 .positive {
   color: #10b981;
-  font-weight: 600;
+  font-weight: 700;
 }
 
 .negative {
   color: #ef4444;
-  font-weight: 600;
-}
-
-.user-id {
-  font-family: monospace;
-  font-size: 12px;
-  color: #9ca3af;
-}
-
-.empty-state {
-  text-align: center;
-  padding: 40px;
-  color: #9ca3af;
-}
-
-.loading {
-  text-align: center;
-  padding: 40px;
-  font-size: 18px;
-  color: #6b7280;
+  font-weight: 700;
 }

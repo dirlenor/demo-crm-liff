@@ -10,7 +10,12 @@ export const PointsHistory = ({ transactions }: PointsHistoryProps) => {
   if (transactions.length === 0) {
     return (
       <div className="no-transactions">
-        <div className="no-transactions-icon">📋</div>
+        <div className="no-transactions-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/>
+          </svg>
+        </div>
         <p>{t('dashboard.noTransactions')}</p>
       </div>
     );
@@ -37,10 +42,34 @@ export const PointsHistory = ({ transactions }: PointsHistoryProps) => {
   };
 
   const getTransactionIcon = (type: string, description: string | null) => {
-    if (description?.includes('QR')) return '🔲';
-    if (description?.includes('Redeem')) return '🎁';
-    if (type === 'earn') return '➕';
-    return '➖';
+    if (description?.includes('QR')) {
+      return (
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2">
+          <rect x="3" y="3" width="14" height="14" rx="1"/>
+          <path d="M7 7h6v6H7z"/>
+        </svg>
+      );
+    }
+    if (description?.includes('Redeem')) {
+      return (
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2">
+          <rect x="3" y="3" width="14" height="14" rx="2"/>
+          <path d="M8 7v6M12 7v6"/>
+        </svg>
+      );
+    }
+    if (type === 'earn') {
+      return (
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2">
+          <path d="M10 5v10M5 10h10"/>
+        </svg>
+      );
+    }
+    return (
+      <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" strokeWidth="2">
+        <path d="M5 10h10"/>
+      </svg>
+    );
   };
 
   return (

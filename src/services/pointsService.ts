@@ -105,3 +105,4 @@ export const getPointHistory = async (
   return data || [];
 };
 
+

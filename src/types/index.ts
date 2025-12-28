@@ -39,12 +39,25 @@ export interface Product {
   updated_at: string;
 }
 
+export interface PaymentTransaction {
+  id: string;
+  line_user_id: string;
+  amount_baht: number;
+  points_purchased: number;
+  status: 'pending' | 'completed' | 'failed';
+  payment_method: string;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface ProductRedemption {
   id: string;
   line_user_id: string;
   product_id: string;
   points_used: number;
   status: 'pending' | 'completed' | 'cancelled';
+  redemption_code: string;
+  expires_at: string;
   created_at: string;
   updated_at: string;
 }
