@@ -151,35 +151,48 @@ export const ProductRedemptionDetail = ({
             )}
           </div>
 
-          {/* Countdown Timer */}
-          {!expired && timeRemaining !== null && (
+          {/* Countdown Timer - Only show if expires_at exists */}
+          {redemption.expires_at && !expired && timeRemaining !== null && (
             <div className="redemption-detail-timer">
               <div className="redemption-detail-timer-label">QR Code หมดอายุใน</div>
               <div className="redemption-detail-timer-value">{formatTime(timeRemaining)}</div>
             </div>
           )}
 
-          {expired && (
+          {redemption.expires_at && expired && (
             <div className="redemption-detail-expired">
               QR Code หมดอายุแล้ว
             </div>
           )}
 
-          {/* QR Code */}
-          {redemption.redemption_code && !expired && (
-            <div className="redemption-detail-qr-section">
-              <div className="redemption-detail-qr-code">
-                <QRCodeSVG
-                  value={redemption.redemption_code}
-                  size={200}
-                  level="M"
-                  includeMargin={true}
-                />
-              </div>
+          {/* Show message if redemption_code is missing (migration not run) */}
+          {!redemption.redemption_code && (
+            <div className="redemption-detail-warning">
+              <p>⚠️ ยังไม่มีรหัสการแลก กรุณารัน Migration 004_add_redemption_codes.sql บน Supabase</p>
             </div>
           )}
 
-          {/* Redemption Code */}
+          {/* QR Code - Show if redemption_code exists */}
+          {redemption.redemption_code && (
+            <div className="redemption-detail-qr-section">
+              {!redemption.expires_at || !expired ? (
+                <div className="redemption-detail-qr-code">
+                  <QRCodeSVG
+                    value={redemption.redemption_code}
+                    size={200}
+                    level="M"
+                    includeMargin={true}
+                  />
+                </div>
+              ) : (
+                <div className="redemption-detail-expired-qr">
+                  <p>QR Code หมดอายุแล้ว</p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Redemption Code - Always show if exists */}
           {redemption.redemption_code && (
             <div className="redemption-detail-code-section">
               <label className="redemption-detail-code-label">รหัสการแลก</label>
@@ -188,7 +201,6 @@ export const ProductRedemptionDetail = ({
                 <button
                   className="redemption-detail-copy-btn"
                   onClick={handleCopyCode}
-                  disabled={expired}
                 >
                   <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                     <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
@@ -198,7 +210,7 @@ export const ProductRedemptionDetail = ({
                 </button>
               </div>
               <p className="redemption-detail-code-hint">
-                กรอกรหัสหรือสแกน QR Code เพื่อยืนยันการแลกรางวัล
+                กรอกรหัสหรือสแกน QR Code เพื่อยืนยันการแลกรางวัล{redemption.expires_at && expired && ' (หมดอายุแล้ว)'}
               </p>
             </div>
           )}

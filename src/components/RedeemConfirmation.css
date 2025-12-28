@@ -1,0 +1,182 @@
+.redeem-confirmation-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.redeem-confirmation-modal {
+  background: #ffffff;
+  border-radius: 16px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.redeem-confirmation-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 24px 24px 0 24px;
+  border-bottom: 1px solid #eeeff2;
+  padding-bottom: 16px;
+  margin-bottom: 24px;
+}
+
+.redeem-confirmation-header h2 {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.redeem-confirmation-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  color: #8e9297;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s;
+}
+
+.redeem-confirmation-close:hover {
+  color: #1a1a1a;
+}
+
+.redeem-confirmation-content {
+  padding: 0 24px 24px 24px;
+}
+
+.redeem-confirmation-product-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  background: #f9fafb;
+}
+
+.redeem-confirmation-product-image-placeholder {
+  width: 100%;
+  height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f9fafb;
+  border-radius: 12px;
+  margin-bottom: 16px;
+  color: #d1d5db;
+}
+
+.redeem-confirmation-product-info {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.redeem-confirmation-product-name {
+  font-size: 20px;
+  font-weight: 700;
+  color: #1a1a1a;
+  margin: 0 0 24px 0;
+}
+
+.redeem-confirmation-points-info {
+  background: #f9fafb;
+  border: 1px solid #eeeff2;
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.points-info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.points-info-row:last-child {
+  margin-bottom: 0;
+}
+
+.points-info-label {
+  font-size: 14px;
+  color: #8e9297;
+  font-weight: 500;
+}
+
+.points-info-value {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.points-info-value.current {
+  color: #1a1a1a;
+}
+
+.points-info-value.deduct {
+  color: #dc2626;
+}
+
+.points-info-value.remaining {
+  color: #10b981;
+  font-size: 18px;
+}
+
+.points-info-divider {
+  height: 1px;
+  background: #eeeff2;
+  margin: 12px 0;
+}
+
+.redeem-confirmation-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.redeem-confirmation-cancel-btn,
+.redeem-confirmation-confirm-btn {
+  flex: 1;
+  padding: 14px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.redeem-confirmation-cancel-btn {
+  background: #f9fafb;
+  color: #4a4d54;
+  border: 1px solid #eeeff2;
+}
+
+.redeem-confirmation-cancel-btn:hover:not(:disabled) {
+  background: #eeeff2;
+}
+
+.redeem-confirmation-confirm-btn {
+  background: #1a1a1a;
+  color: #ffffff;
+}
+
+.redeem-confirmation-confirm-btn:hover:not(:disabled) {
+  background: #2d2d2d;
+}
+
+.redeem-confirmation-cancel-btn:disabled,
+.redeem-confirmation-confirm-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+

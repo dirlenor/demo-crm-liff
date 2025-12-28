@@ -3,6 +3,7 @@ import { getActiveProducts, redeemProduct } from '../services/productService';
 import { getUserPoints } from '../services/pointsService';
 import type { Product, TourMember } from '../types';
 import { t, getLanguage } from '../utils/i18n';
+import { RedeemConfirmation } from './RedeemConfirmation';
 import './Products.css';
 
 interface ProductsProps {
@@ -17,6 +18,7 @@ export const Products = ({ userId, onRedeemSuccess, onRedeem }: ProductsProps) =
   const [loading, setLoading] = useState(true);
   const [redeemingId, setRedeemingId] = useState<string | null>(null);
   const [message, setMessage] = useState<string | null>(null);
+  const [confirmProduct, setConfirmProduct] = useState<Product | null>(null);
 
   useEffect(() => {
     loadData();
@@ -38,7 +40,7 @@ export const Products = ({ userId, onRedeemSuccess, onRedeem }: ProductsProps) =
     }
   };
 
-  const handleRedeem = async (product: Product) => {
+  const handleRedeemClick = (product: Product) => {
     if (!user) return;
 
     if (user.points_balance < product.points_required) {
@@ -53,14 +55,22 @@ export const Products = ({ userId, onRedeemSuccess, onRedeem }: ProductsProps) =
       return;
     }
 
-    setRedeemingId(product.id);
+    // Show confirmation dialog
+    setConfirmProduct(product);
+  };
+
+  const handleConfirmRedeem = async () => {
+    if (!confirmProduct || !user) return;
+
+    setRedeemingId(confirmProduct.id);
     setMessage(null);
+    setConfirmProduct(null);
 
     try {
-      const result = await redeemProduct(userId, product.id);
+      const result = await redeemProduct(userId, confirmProduct.id);
       const redemptionId = result.redemptionId || result;
       
-      setMessage(t('message.productRedeemed') || `แลก ${product.name} สำเร็จ`);
+      setMessage(t('message.productRedeemed') || `แลก ${confirmProduct.name} สำเร็จ`);
       onRedeemSuccess?.();
       await loadData();
       
@@ -166,7 +176,7 @@ export const Products = ({ userId, onRedeemSuccess, onRedeem }: ProductsProps) =
                   </div>
 
                   <button
-                    onClick={() => handleRedeem(product)}
+                    onClick={() => handleRedeemClick(product)}
                     disabled={!canRedeem || !inStock || isRedeeming}
                     className={`redeem-product-btn ${!canRedeem ? 'disabled' : ''}`}
                   >
@@ -188,6 +198,15 @@ export const Products = ({ userId, onRedeemSuccess, onRedeem }: ProductsProps) =
             );
           })}
         </div>
+      )}
+
+      {confirmProduct && user && (
+        <RedeemConfirmation
+          product={confirmProduct}
+          user={user}
+          onConfirm={handleConfirmRedeem}
+          onCancel={() => setConfirmProduct(null)}
+        />
       )}
     </div>
   );

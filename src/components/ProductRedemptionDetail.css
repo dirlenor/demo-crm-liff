@@ -212,6 +212,31 @@
   text-align: center;
 }
 
+.redemption-detail-warning {
+  background: #fef3c7;
+  border: 1px solid #fbbf24;
+  border-radius: 12px;
+  padding: 16px;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.redemption-detail-warning p {
+  font-size: 14px;
+  color: #92400e;
+  margin: 0;
+}
+
+.redemption-detail-expired-qr {
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+  border-radius: 12px;
+  padding: 32px;
+  text-align: center;
+  color: #991b1b;
+  font-weight: 600;
+}
+
 .redemption-detail-loading,
 .redemption-detail-error {
   background: #ffffff;
