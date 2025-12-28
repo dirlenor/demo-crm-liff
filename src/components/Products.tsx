@@ -57,12 +57,19 @@ export const Products = ({ userId, onRedeemSuccess, onRedeem }: ProductsProps) =
     setMessage(null);
 
     try {
-      const { redemptionId } = await redeemProduct(userId, product.id);
+      const result = await redeemProduct(userId, product.id);
+      const redemptionId = result.redemptionId || result;
+      
       setMessage(t('message.productRedeemed') || `แลก ${product.name} สำเร็จ`);
       onRedeemSuccess?.();
       await loadData();
-      // Navigate to redemption detail page
-      onRedeem?.(redemptionId);
+      
+      // Navigate to redemption detail page after a short delay
+      setTimeout(() => {
+        if (typeof redemptionId === 'string') {
+          onRedeem?.(redemptionId);
+        }
+      }, 500);
     } catch (error: any) {
       console.error('Error redeeming product:', error);
       const errorMsg = error.message?.includes('Insufficient') 

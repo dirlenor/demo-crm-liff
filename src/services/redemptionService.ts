@@ -32,3 +32,31 @@ export const getRedemptionDetail = async (
   };
 };
 
+export const getUserRedemptions = async (
+  userId: string,
+  limit: number = 50
+): Promise<RedemptionDetail[]> => {
+  const { data, error } = await supabase
+    .from('product_redemptions')
+    .select(`
+      *,
+      product:products(*)
+    `)
+    .eq('line_user_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    console.error('Error fetching user redemptions:', error);
+    throw error;
+  }
+
+  if (!data) {
+    return [];
+  }
+
+  return data.map((item) => ({
+    ...item,
+    product: item.product as Product,
+  }));
+};

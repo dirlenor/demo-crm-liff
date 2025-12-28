@@ -5,6 +5,7 @@ import { PointsHistory } from './PointsHistory';
 import { EarnPointsButton } from './EarnPointsButton';
 import { RedeemPointsButton } from './RedeemPointsButton';
 import { Products } from './Products';
+import { MyRedemptions } from './MyRedemptions';
 import { TopUpPoints } from './TopUpPoints';
 import { ProductRedemptionDetail } from './ProductRedemptionDetail';
 import { t } from '../utils/i18n';
@@ -20,7 +21,7 @@ export const PointsDashboard = ({ userId, displayName, profilePicture }: PointsD
   const [user, setUser] = useState<TourMember | null>(null);
   const [transactions, setTransactions] = useState<PointTransaction[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'history'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'my-redemptions' | 'history'>('overview');
   const [showTopUp, setShowTopUp] = useState(false);
   const [redemptionId, setRedemptionId] = useState<string | null>(null);
 
@@ -143,6 +144,9 @@ export const PointsDashboard = ({ userId, displayName, profilePicture }: PointsD
             onRedeem={handleRedeem}
           />
         )}
+        {activeTab === 'my-redemptions' && (
+          <MyRedemptions userId={userId} />
+        )}
         {activeTab === 'history' && <PointsHistory transactions={transactions} />}
       </div>
 
@@ -152,6 +156,9 @@ export const PointsDashboard = ({ userId, displayName, profilePicture }: PointsD
         </button>
         <button className={`nav-item-btn ${activeTab === 'products' ? 'active' : ''}`} onClick={() => setActiveTab('products')}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 8v8M8 12h8"/></svg>
+        </button>
+        <button className={`nav-item-btn ${activeTab === 'my-redemptions' ? 'active' : ''}`} onClick={() => setActiveTab('my-redemptions')}>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 7h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v3H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V9c0-1.11-.89-2-2-2zm-6 0h-4V4h4v3z"/></svg>
         </button>
         <button className={`nav-item-btn ${activeTab === 'history' ? 'active' : ''}`} onClick={() => setActiveTab('history')}>
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
