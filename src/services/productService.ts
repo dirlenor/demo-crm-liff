@@ -30,18 +30,46 @@ export const redeemProduct = async (
     throw error;
   }
 
-  // RPC returns a table/array with redemption_id and redemption_code
-  if (!data || (Array.isArray(data) && data.length === 0)) {
-    throw new Error('Failed to redeem product');
-  }
-
-  // Handle array response
-  const result = Array.isArray(data) ? data[0] : data;
+  // Handle different return types:
+  // 1. New format: returns TABLE (array) with {redemption_id, redemption_code}
+  // 2. Old format: returns UUID directly (for backward compatibility)
   
-  return {
-    redemptionId: result.redemption_id,
-    redemptionCode: result.redemption_code,
-  };
+  if (Array.isArray(data)) {
+    // New format - TABLE return
+    if (data.length === 0) {
+      throw new Error('Failed to redeem product');
+    }
+    const result = data[0];
+    return {
+      redemptionId: result.redemption_id,
+      redemptionCode: result.redemption_code || '',
+    };
+  } else if (typeof data === 'string') {
+    // Old format - UUID return (backward compatibility if migration not run)
+    // Fetch redemption details to get code
+    const { data: redemption, error: fetchError } = await supabase
+      .from('product_redemptions')
+      .select('id, redemption_code')
+      .eq('id', data)
+      .single();
+    
+    if (fetchError || !redemption) {
+      throw new Error('Failed to fetch redemption details');
+    }
+    
+    return {
+      redemptionId: redemption.id,
+      redemptionCode: redemption.redemption_code || '',
+    };
+  } else if (data && typeof data === 'object' && 'redemption_id' in data) {
+    // Direct object return
+    return {
+      redemptionId: data.redemption_id,
+      redemptionCode: data.redemption_code || '',
+    };
+  }
+  
+  throw new Error('Unexpected response format from redeem_product');
 };
 
 
