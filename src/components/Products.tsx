@@ -67,12 +67,23 @@ export const Products = ({ userId, onRedeemSuccess, onRedeem }: ProductsProps) =
     setConfirmProduct(null);
 
     try {
+      console.log('Starting redemption for product:', confirmProduct.id);
       const result = await redeemProduct(userId, confirmProduct.id);
+      console.log('Redemption result:', result);
+      
       const redemptionId = result.redemptionId || result;
       
+      if (!redemptionId) {
+        throw new Error('No redemption ID returned');
+      }
+      
       setMessage(t('message.productRedeemed') || `แลก ${confirmProduct.name} สำเร็จ`);
-      onRedeemSuccess?.();
+      
+      // Refresh user data and products first
       await loadData();
+      
+      // Notify parent to refresh all data
+      onRedeemSuccess?.();
       
       // Navigate to redemption detail page after a short delay
       setTimeout(() => {
@@ -82,13 +93,21 @@ export const Products = ({ userId, onRedeemSuccess, onRedeem }: ProductsProps) =
       }, 500);
     } catch (error: any) {
       console.error('Error redeeming product:', error);
-      const errorMsg = error.message?.includes('Insufficient') 
+      console.error('Error details:', {
+        message: error.message,
+        code: error.code,
+        details: error.details,
+        hint: error.hint
+      });
+      
+      const errorMsg = error.message?.includes('Insufficient') || error.message?.includes('insufficient')
         ? t('message.insufficientPoints')
-        : error.message?.includes('out of stock')
+        : error.message?.includes('out of stock') || error.message?.includes('out of stock')
         ? 'สินค้าหมด'
-        : t('message.error');
+        : error.message || 'เกิดข้อผิดพลาดในการแลกรางวัล';
+      
       setMessage(errorMsg);
-      setTimeout(() => setMessage(null), 3000);
+      setTimeout(() => setMessage(null), 5000);
     } finally {
       setRedeemingId(null);
     }

@@ -24,6 +24,7 @@ export const PointsDashboard = ({ userId, displayName, profilePicture }: PointsD
   const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'my-redemptions' | 'history'>('overview');
   const [showTopUp, setShowTopUp] = useState(false);
   const [redemptionId, setRedemptionId] = useState<string | null>(null);
+  const [refreshRedemptions, setRefreshRedemptions] = useState(0);
 
   const loadData = async () => {
     try {
@@ -46,6 +47,8 @@ export const PointsDashboard = ({ userId, displayName, profilePicture }: PointsD
 
   const handlePointsUpdate = () => {
     loadData();
+    // Trigger refresh for My Redemptions tab
+    setRefreshRedemptions(prev => prev + 1);
   };
 
   const handleRedeem = (id: string) => {
@@ -145,7 +148,7 @@ export const PointsDashboard = ({ userId, displayName, profilePicture }: PointsD
           />
         )}
         {activeTab === 'my-redemptions' && (
-          <MyRedemptions userId={userId} />
+          <MyRedemptions key={refreshRedemptions} userId={userId} />
         )}
         {activeTab === 'history' && <PointsHistory transactions={transactions} />}
       </div>
