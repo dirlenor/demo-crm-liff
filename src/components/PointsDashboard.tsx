@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { getUserPoints, getPointHistory, createOrUpdateUser } from '../services/pointsService';
-import type { TourMember, PointTransaction } from '../types';
+import type { TourMember, PointTransaction, Product } from '../types';
 import { PointsHistory } from './PointsHistory';
 import { Products } from './Products';
 import { MyRedemptions } from './MyRedemptions';
 import { TopUpPoints } from './TopUpPoints';
 import { ProductRedemptionDetail } from './ProductRedemptionDetail';
+import { getActiveProducts } from '../services/productService';
 import { t } from '../utils/i18n';
 import './PointsDashboard.css';
 
@@ -15,11 +16,12 @@ interface PointsDashboardProps {
   profilePicture?: string;
 }
 
-export const PointsDashboard = ({ userId, displayName }: PointsDashboardProps) => {
+export const PointsDashboard = ({ userId, displayName, profilePicture }: PointsDashboardProps) => {
   const [user, setUser] = useState<TourMember | null>(null);
   const [transactions, setTransactions] = useState<PointTransaction[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'my-redemptions' | 'history'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'my-redemptions' | 'history' | 'wallet' | 'offers' | 'profile'>('overview');
   const [showTopUp, setShowTopUp] = useState(false);
   const [redemptionId, setRedemptionId] = useState<string | null>(null);
   const [refreshRedemptions, setRefreshRedemptions] = useState(0);
@@ -32,6 +34,8 @@ export const PointsDashboard = ({ userId, displayName }: PointsDashboardProps) =
       setUser(userData);
       const history = await getPointHistory(userId, 10);
       setTransactions(history);
+      const productsData = await getActiveProducts();
+      setProducts(productsData.slice(0, 3)); // Show first 3 for preview
     } catch (error) {
       console.error('Error loading dashboard data:', error);
     } finally {
@@ -45,7 +49,6 @@ export const PointsDashboard = ({ userId, displayName }: PointsDashboardProps) =
 
   const handlePointsUpdate = () => {
     loadData();
-    // Trigger refresh for My Redemptions tab
     setRefreshRedemptions(prev => prev + 1);
   };
 
@@ -60,161 +63,146 @@ export const PointsDashboard = ({ userId, displayName }: PointsDashboardProps) =
   if (loading) return <div className="loading-spinner"><div className="spinner"></div></div>;
   if (!user) return <div className="error-message">{t('message.error')}</div>;
 
-  // Calculate progress (assuming max 500 points for progress bar)
-  const maxPoints = 500;
-  const progressPercentage = Math.min((user.points_balance / maxPoints) * 100, 100);
+  // Calculate tier progress (Gold Tier: 750/1000)
+  const currentTier = 'Gold Tier';
+  const currentProgress = user.points_balance;
+  const nextTierPoints = 1000;
+  const progressToNext = Math.min((currentProgress / nextTierPoints) * 100, 100);
+  const pointsToNext = Math.max(0, nextTierPoints - currentProgress);
 
   return (
-    <div className="dashboard-container">
-      <header className="app-header-rewards">
-        <button className="header-back-btn" onClick={() => window.history.back()}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m15 18-6-6 6-6"/></svg>
-        </button>
-        <h1 className="header-title">Rewards club</h1>
-        <button className="header-help-btn">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+    <div className="reward-dashboard">
+      {/* Top Navigation */}
+      <header className="reward-header">
+        <div className="header-left">
+          {profilePicture ? (
+            <img src={profilePicture} alt={displayName} className="header-avatar" />
+          ) : (
+            <div className="header-avatar placeholder"></div>
+          )}
+          <span className="header-greeting">Hi, {displayName.split(' ')[0]}!</span>
+        </div>
+        <button className="header-notification-btn">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/>
+            <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>
+          </svg>
+          <span className="notification-badge"></span>
         </button>
       </header>
 
-      <div className="content-area">
+      <div className="reward-content">
         {activeTab === 'overview' && (
           <>
-            {/* Your Points Card with Progress */}
-            <div className="points-card-rewards">
-              <div className="points-card-content">
-                <div className="points-icon-wrapper">
-                  <svg className="progress-ring" width="60" height="60">
-                    <circle
-                      className="progress-ring-circle-bg"
-                      stroke="#E0E0E0"
-                      strokeWidth="3"
-                      fill="transparent"
-                      r="26"
-                      cx="30"
-                      cy="30"
-                    />
-                    <circle
-                      className="progress-ring-circle"
-                      stroke="#FFA500"
-                      strokeWidth="3"
-                      fill="transparent"
-                      r="26"
-                      cx="30"
-                      cy="30"
-                      style={{
-                        strokeDasharray: `${2 * Math.PI * 26}`,
-                        strokeDashoffset: `${2 * Math.PI * 26 * (1 - progressPercentage / 100)}`,
-                        transform: 'rotate(-90deg)',
-                        transformOrigin: '30px 30px',
-                        transition: 'stroke-dashoffset 0.3s ease',
-                      }}
-                    />
-                  </svg>
-                  <div className="points-icon-circle">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <circle cx="12" cy="12" r="10"/>
-                      <path d="M12 6v6l4 2"/>
+            {/* Hero Section: Points & Mascot */}
+            <section className="hero-section">
+              <div className="hero-container">
+                {/* Mascot Placeholder */}
+                <div className="mascot-container">
+                  <div className="mascot-bounce">
+                    <svg width="128" height="128" viewBox="0 0 128 128" fill="none">
+                      <circle cx="64" cy="64" r="60" fill="#FFD700"/>
+                      <circle cx="64" cy="64" r="50" fill="#FFA500"/>
+                      <circle cx="50" cy="50" r="8" fill="#1a1a1a"/>
+                      <circle cx="78" cy="50" r="8" fill="#1a1a1a"/>
+                      <path d="M50 75 Q64 85 78 75" stroke="#1a1a1a" strokeWidth="3" fill="none" strokeLinecap="round"/>
                     </svg>
                   </div>
                 </div>
-                <div className="points-info">
-                  <div className="points-label">Your points</div>
-                  <div className="points-value-large">{user.points_balance}</div>
-                  <div className="points-max">/{maxPoints}</div>
+                {/* Points Display */}
+                <div className="points-display">
+                  <h1 className="points-value">{user.points_balance.toLocaleString()}</h1>
+                  <p className="points-label">Total Points</p>
                 </div>
-                <button className="points-arrow-btn" onClick={() => setActiveTab('history')}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><path d="m9 18 6-6-6-6"/></svg>
+              </div>
+            </section>
+
+            {/* Progress Bar Section */}
+            <section className="progress-section">
+              <div className="progress-card">
+                <div className="progress-header">
+                  <span className="tier-name">{currentTier}</span>
+                  <span className="tier-progress">{currentProgress} / {nextTierPoints} to next level</span>
+                </div>
+                <div className="progress-bar-container">
+                  <div className="progress-bar-bg">
+                    <div className="progress-bar-fill" style={{ width: `${progressToNext}%` }}></div>
+                  </div>
+                </div>
+                <div className="progress-hint">
+                  Earn {pointsToNext} more points to unlock <span className="highlight">2x Multiplier</span>
+                </div>
+              </div>
+            </section>
+
+            {/* Quick Actions */}
+            <section className="quick-actions">
+              <div className="actions-grid">
+                <button className="action-btn" onClick={() => setActiveTab('history')}>
+                  <div className="action-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <circle cx="12" cy="12" r="10"/>
+                      <polyline points="12 6 12 12 16 14"/>
+                    </svg>
+                  </div>
+                  <span className="action-label">History</span>
+                </button>
+                <button className="action-btn action-btn-primary" onClick={() => setShowTopUp(true)}>
+                  <div className="action-icon">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <circle cx="12" cy="12" r="10"/>
+                      <line x1="12" y1="8" x2="12" y2="16"/>
+                      <line x1="8" y1="12" x2="16" y2="12"/>
+                    </svg>
+                  </div>
+                  <span className="action-label">Earn</span>
+                </button>
+                <button className="action-btn" onClick={() => setActiveTab('my-redemptions')}>
+                  <div className="action-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+                    </svg>
+                  </div>
+                  <span className="action-label">Send</span>
                 </button>
               </div>
-            </div>
+            </section>
 
-            {/* Navigation Cards */}
-            <div className="nav-cards-grid">
-              <button className="nav-card" onClick={() => setActiveTab('history')}>
-                <div className="nav-card-icon history-icon">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
-                    <line x1="16" y1="2" x2="16" y2="6"/>
-                    <line x1="8" y1="2" x2="8" y2="6"/>
-                    <line x1="3" y1="10" x2="21" y2="10"/>
-                  </svg>
-                </div>
-                <div className="nav-card-label">History</div>
-              </button>
-              <button className="nav-card" onClick={() => setActiveTab('products')}>
-                <div className="nav-card-icon explore-icon">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <circle cx="11" cy="11" r="8"/>
-                    <path d="m21 21-4.3-4.3"/>
-                    <circle cx="11" cy="11" r="3" fill="currentColor" opacity="0.3"/>
-                  </svg>
-                </div>
-                <div className="nav-card-label">Explore rewards</div>
-              </button>
-              <button className="nav-card" onClick={() => setActiveTab('my-redemptions')}>
-                <div className="nav-card-icon rewards-icon">
-                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M20 7h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v3H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V9c0-1.11-.89-2-2-2zm-6 0h-4V4h4v3z"/>
-                    <path d="M12 12v4M10 14h4" strokeLinecap="round"/>
-                  </svg>
-                </div>
-                <div className="nav-card-label">Your rewards</div>
-              </button>
-            </div>
-
-            {/* Promotional Banner */}
-            <div className="promo-banner">
-              <div className="promo-content">
-                <div className="promo-text">
-                  <div className="promo-title">Discover today's top deals.</div>
-                  <div className="promo-subtitle">Treat yourself and collect more points while you're at it.</div>
-                  <button className="promo-link" onClick={() => setActiveTab('products')}>Shop now</button>
-                </div>
-                <div className="promo-image-placeholder"></div>
+            {/* Available Rewards */}
+            <section className="rewards-section">
+              <div className="rewards-header">
+                <h2 className="rewards-title">Available Rewards</h2>
+                <button className="rewards-see-all" onClick={() => setActiveTab('products')}>See All</button>
               </div>
-            </div>
-
-            {/* Missions Section */}
-            <h3 className="section-label-missions">Missions</h3>
-            <div className="missions-grid">
-              <button className="mission-card mission-card-blue" onClick={() => setShowTopUp(true)}>
-                <div className="mission-icon-wrapper">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <rect x="3" y="3" width="18" height="18" rx="2"/>
-                    <path d="M9 9h6v6H9z"/>
-                    <path d="M9 3v6M15 3v6M9 15v6M15 15v6"/>
-                  </svg>
-                </div>
-                <div className="mission-reward">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <circle cx="12" cy="12" r="10"/>
-                    <path d="M12 6v6l4 2"/>
-                  </svg>
-                  <span>10 x3</span>
-                </div>
-                <div className="mission-title">Top up points</div>
-              </button>
-              <button className="mission-card mission-card-yellow" onClick={() => setActiveTab('products')}>
-                <div className="mission-icon-wrapper">
-                  <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <path d="M12 2L2 7l10 5 10-5-10-5z"/>
-                    <path d="M2 17l10 5 10-5M2 12l10 5 10-5"/>
-                  </svg>
-                </div>
-                <div className="mission-reward">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                    <circle cx="12" cy="12" r="10"/>
-                    <path d="M12 6v6l4 2"/>
-                  </svg>
-                  <span>10 x10</span>
-                </div>
-                <div className="mission-title">Redeem rewards</div>
-              </button>
-            </div>
-
-            {/* Recent Activity */}
-            <h3 className="section-label-missions" style={{ marginTop: '32px' }}>Recent Activity</h3>
-            <PointsHistory transactions={transactions.slice(0, 5)} />
+              <div className="rewards-scroll">
+                {products.map((product) => (
+                  <div key={product.id} className="reward-card" onClick={() => setActiveTab('products')}>
+                    <div className="reward-image">
+                      {product.image_url ? (
+                        <img src={product.image_url} alt={product.name} />
+                      ) : (
+                        <div className="reward-image-placeholder"></div>
+                      )}
+                    </div>
+                    <div className="reward-info">
+                      <h3 className="reward-name">{product.name}</h3>
+                      <p className="reward-desc">{product.description || 'Digital Code'}</p>
+                      <div className="reward-footer">
+                        <span className="reward-points">{product.points_required} Pts</span>
+                        <button className="reward-arrow">
+                          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <path d="m9 18 6-6-6-6"/>
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                {products.length === 0 && (
+                  <div className="no-rewards">No rewards available</div>
+                )}
+              </div>
+            </section>
           </>
         )}
 
@@ -229,22 +217,65 @@ export const PointsDashboard = ({ userId, displayName }: PointsDashboardProps) =
           <MyRedemptions key={refreshRedemptions} userId={userId} />
         )}
         {activeTab === 'history' && <PointsHistory transactions={transactions} />}
+        {activeTab === 'wallet' && (
+          <div className="tab-placeholder">
+            <h2>Wallet</h2>
+            <p>Coming soon...</p>
+          </div>
+        )}
+        {activeTab === 'offers' && (
+          <div className="tab-placeholder">
+            <h2>Offers</h2>
+            <p>Coming soon...</p>
+          </div>
+        )}
+        {activeTab === 'profile' && (
+          <div className="tab-placeholder">
+            <h2>Profile</h2>
+            <p>Coming soon...</p>
+          </div>
+        )}
       </div>
 
-      <div className="bottom-nav-modern">
-        <button className={`nav-item-btn ${activeTab === 'overview' ? 'active' : ''}`} onClick={() => setActiveTab('overview')}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-        </button>
-        <button className={`nav-item-btn ${activeTab === 'products' ? 'active' : ''}`} onClick={() => setActiveTab('products')}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 8v8M8 12h8"/></svg>
-        </button>
-        <button className={`nav-item-btn ${activeTab === 'my-redemptions' ? 'active' : ''}`} onClick={() => setActiveTab('my-redemptions')}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 7h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v3H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V9c0-1.11-.89-2-2-2zm-6 0h-4V4h4v3z"/></svg>
-        </button>
-        <button className={`nav-item-btn ${activeTab === 'history' ? 'active' : ''}`} onClick={() => setActiveTab('history')}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M12 20V10M18 20V4M6 20v-4"/></svg>
-        </button>
-      </div>
+      {/* Bottom Navigation Bar */}
+      <nav className="bottom-nav">
+        <div className="bottom-nav-container">
+          <button className={`nav-btn ${activeTab === 'overview' ? 'active' : ''}`} onClick={() => setActiveTab('overview')}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+              <polyline points="9 22 9 12 15 12 15 22"/>
+            </svg>
+            <span className="nav-label">Home</span>
+          </button>
+          <button className={`nav-btn ${activeTab === 'wallet' ? 'active' : ''}`} onClick={() => setActiveTab('wallet')}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
+              <line x1="1" y1="10" x2="23" y2="10"/>
+            </svg>
+            <span className="nav-label">Wallet</span>
+          </button>
+          <button className="nav-btn nav-btn-center" onClick={() => setActiveTab('products')}>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <rect x="3" y="3" width="18" height="18" rx="2"/>
+              <path d="M9 9h6v6H9z"/>
+            </svg>
+          </button>
+          <button className={`nav-btn ${activeTab === 'offers' ? 'active' : ''}`} onClick={() => setActiveTab('offers')}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+              <line x1="7" y1="7" x2="7.01" y2="7"/>
+            </svg>
+            <span className="nav-label">Offers</span>
+          </button>
+          <button className={`nav-btn ${activeTab === 'profile' ? 'active' : ''}`} onClick={() => setActiveTab('profile')}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+            <span className="nav-label">Profile</span>
+          </button>
+        </div>
+      </nav>
 
       {showTopUp && (
         <TopUpPoints
