@@ -136,40 +136,6 @@ export const PointsDashboard = ({ userId, displayName, profilePicture }: PointsD
               </div>
             </section>
 
-            {/* Quick Actions */}
-            <section className="quick-actions">
-              <div className="actions-grid">
-                <button className="action-btn" onClick={() => setActiveTab('history')}>
-                  <div className="action-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <circle cx="12" cy="12" r="10"/>
-                      <polyline points="12 6 12 12 16 14"/>
-                    </svg>
-                  </div>
-                  <span className="action-label">History</span>
-                </button>
-                <button className="action-btn action-btn-primary" onClick={() => setShowTopUp(true)}>
-                  <div className="action-icon">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <circle cx="12" cy="12" r="10"/>
-                      <line x1="12" y1="8" x2="12" y2="16"/>
-                      <line x1="8" y1="12" x2="16" y2="12"/>
-                    </svg>
-                  </div>
-                  <span className="action-label">Earn</span>
-                </button>
-                <button className="action-btn" onClick={() => { setActiveTab('reward'); setRewardSubTab('products'); }}>
-                  <div className="action-icon">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
-                      <line x1="7" y1="7" x2="7.01" y2="7"/>
-                    </svg>
-                  </div>
-                  <span className="action-label">Reward</span>
-                </button>
-              </div>
-            </section>
-
             {/* Available Rewards */}
             <section className="rewards-section">
               <div className="rewards-header">
