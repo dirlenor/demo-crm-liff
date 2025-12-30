@@ -84,3 +84,5 @@ git push -u origin main
 - หลังจาก deploy แล้ว ต้องอัปเดต LIFF Endpoint URL ใน LINE Developers Console
 
 
+
+

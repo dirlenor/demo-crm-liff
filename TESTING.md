@@ -254,3 +254,5 @@ vercel --prod
 - **Mock Payment**: การเติมเงินเป็นแบบ Mock ไม่ได้ใช้ Payment Gateway จริง
 - **QR Code Expiry**: QR Code หมดอายุหลัง 15 นาที
 
+
+

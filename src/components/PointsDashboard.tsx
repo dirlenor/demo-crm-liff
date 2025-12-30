@@ -21,7 +21,8 @@ export const PointsDashboard = ({ userId, displayName, profilePicture }: PointsD
   const [transactions, setTransactions] = useState<PointTransaction[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'overview' | 'products' | 'my-redemptions' | 'history' | 'wallet' | 'offers' | 'profile'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'reward' | 'history'>('overview');
+  const [rewardSubTab, setRewardSubTab] = useState<'products' | 'my-redemptions'>('products');
   const [showTopUp, setShowTopUp] = useState(false);
   const [redemptionId, setRedemptionId] = useState<string | null>(null);
   const [refreshRedemptions, setRefreshRedemptions] = useState(0);
@@ -157,13 +158,14 @@ export const PointsDashboard = ({ userId, displayName, profilePicture }: PointsD
                   </div>
                   <span className="action-label">Earn</span>
                 </button>
-                <button className="action-btn" onClick={() => setActiveTab('my-redemptions')}>
+                <button className="action-btn" onClick={() => { setActiveTab('reward'); setRewardSubTab('products'); }}>
                   <div className="action-icon">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+                      <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+                      <line x1="7" y1="7" x2="7.01" y2="7"/>
                     </svg>
                   </div>
-                  <span className="action-label">Send</span>
+                  <span className="action-label">Reward</span>
                 </button>
               </div>
             </section>
@@ -172,11 +174,11 @@ export const PointsDashboard = ({ userId, displayName, profilePicture }: PointsD
             <section className="rewards-section">
               <div className="rewards-header">
                 <h2 className="rewards-title">Available Rewards</h2>
-                <button className="rewards-see-all" onClick={() => setActiveTab('products')}>See All</button>
+                <button className="rewards-see-all" onClick={() => { setActiveTab('reward'); setRewardSubTab('products'); }}>See All</button>
               </div>
               <div className="rewards-scroll">
                 {products.map((product) => (
-                  <div key={product.id} className="reward-card" onClick={() => setActiveTab('products')}>
+                  <div key={product.id} className="reward-card" onClick={() => { setActiveTab('reward'); setRewardSubTab('products'); }}>
                     <div className="reward-image">
                       {product.image_url ? (
                         <img src={product.image_url} alt={product.name} />
@@ -206,35 +208,35 @@ export const PointsDashboard = ({ userId, displayName, profilePicture }: PointsD
           </>
         )}
 
-        {activeTab === 'products' && (
-          <Products
-            userId={userId}
-            onRedeemSuccess={handlePointsUpdate}
-            onRedeem={handleRedeem}
-          />
-        )}
-        {activeTab === 'my-redemptions' && (
-          <MyRedemptions key={refreshRedemptions} userId={userId} />
+        {activeTab === 'reward' && (
+          <div className="reward-tab-container">
+            <div className="reward-tab-header">
+              <button 
+                className={`reward-tab-btn ${rewardSubTab === 'products' ? 'active' : ''}`}
+                onClick={() => setRewardSubTab('products')}
+              >
+                Explore Rewards
+              </button>
+              <button 
+                className={`reward-tab-btn ${rewardSubTab === 'my-redemptions' ? 'active' : ''}`}
+                onClick={() => setRewardSubTab('my-redemptions')}
+              >
+                My Rewards
+              </button>
+            </div>
+            {rewardSubTab === 'products' && (
+              <Products
+                userId={userId}
+                onRedeemSuccess={handlePointsUpdate}
+                onRedeem={handleRedeem}
+              />
+            )}
+            {rewardSubTab === 'my-redemptions' && (
+              <MyRedemptions key={refreshRedemptions} userId={userId} />
+            )}
+          </div>
         )}
         {activeTab === 'history' && <PointsHistory transactions={transactions} />}
-        {activeTab === 'wallet' && (
-          <div className="tab-placeholder">
-            <h2>Wallet</h2>
-            <p>Coming soon...</p>
-          </div>
-        )}
-        {activeTab === 'offers' && (
-          <div className="tab-placeholder">
-            <h2>Offers</h2>
-            <p>Coming soon...</p>
-          </div>
-        )}
-        {activeTab === 'profile' && (
-          <div className="tab-placeholder">
-            <h2>Profile</h2>
-            <p>Coming soon...</p>
-          </div>
-        )}
       </div>
 
       {/* Bottom Navigation Bar */}
@@ -247,32 +249,21 @@ export const PointsDashboard = ({ userId, displayName, profilePicture }: PointsD
             </svg>
             <span className="nav-label">Home</span>
           </button>
-          <button className={`nav-btn ${activeTab === 'wallet' ? 'active' : ''}`} onClick={() => setActiveTab('wallet')}>
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <rect x="1" y="4" width="22" height="16" rx="2" ry="2"/>
-              <line x1="1" y1="10" x2="23" y2="10"/>
-            </svg>
-            <span className="nav-label">Wallet</span>
-          </button>
-          <button className="nav-btn nav-btn-center" onClick={() => setActiveTab('products')}>
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <rect x="3" y="3" width="18" height="18" rx="2"/>
-              <path d="M9 9h6v6H9z"/>
-            </svg>
-          </button>
-          <button className={`nav-btn ${activeTab === 'offers' ? 'active' : ''}`} onClick={() => setActiveTab('offers')}>
+          <button className={`nav-btn ${activeTab === 'reward' ? 'active' : ''}`} onClick={() => { setActiveTab('reward'); setRewardSubTab('products'); }}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
               <line x1="7" y1="7" x2="7.01" y2="7"/>
             </svg>
-            <span className="nav-label">Offers</span>
+            <span className="nav-label">Reward</span>
           </button>
-          <button className={`nav-btn ${activeTab === 'profile' ? 'active' : ''}`} onClick={() => setActiveTab('profile')}>
+          <button className={`nav-btn ${activeTab === 'history' ? 'active' : ''}`} onClick={() => setActiveTab('history')}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-              <circle cx="12" cy="7" r="4"/>
+              <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+              <line x1="16" y1="2" x2="16" y2="6"/>
+              <line x1="8" y1="2" x2="8" y2="6"/>
+              <line x1="3" y1="10" x2="21" y2="10"/>
             </svg>
-            <span className="nav-label">Profile</span>
+            <span className="nav-label">History</span>
           </button>
         </div>
       </nav>

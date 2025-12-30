@@ -42,3 +42,5 @@ vercel --prod
 สำหรับ production ควรเพิ่ม authentication (Supabase Auth) เพื่อป้องกันการเข้าถึงโดยไม่ได้รับอนุญาต
 
 
+
+

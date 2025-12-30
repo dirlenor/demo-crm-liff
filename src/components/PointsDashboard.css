@@ -427,11 +427,12 @@
 
 .bottom-nav-container {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
   align-items: center;
   max-width: 448px;
   margin: 0 auto;
   height: 64px;
+  gap: 0;
 }
 
 .nav-btn {
@@ -439,12 +440,13 @@
   flex-direction: column;
   align-items: center;
   gap: 4px;
-  width: 48px;
+  flex: 1;
+  max-width: 120px;
   background: transparent;
   border: none;
   color: #9ca3af;
   cursor: pointer;
-  padding: 0;
+  padding: 8px 0;
   transition: color 0.2s;
 }
 
@@ -465,27 +467,40 @@
   font-weight: 700;
 }
 
-.nav-btn-center {
-  position: relative;
-  top: -24px;
-  width: 56px;
-  height: 56px;
-  background: #0d1b12;
-  color: #ffffff;
-  border-radius: 50%;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+/* Reward Tab Container */
+.reward-tab-container {
+  width: 100%;
+}
+
+.reward-tab-header {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.2s;
+  background: #ffffff;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+  padding: 0 16px;
+  gap: 8px;
 }
 
-.nav-btn-center:hover {
-  transform: scale(1.05);
+.reward-tab-btn {
+  flex: 1;
+  padding: 12px 16px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: #9ca3af;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
 }
 
-.nav-btn-center .nav-label {
-  display: none;
+.reward-tab-btn.active {
+  color: #13ec5b;
+  border-bottom-color: #13ec5b;
+  font-weight: 700;
+}
+
+.reward-tab-btn:hover {
+  color: #0d1b12;
 }
 
 /* Loading and Error States */
